@@ -154,6 +154,7 @@ function cadastraCurso() {
 
   let erro = false;
   let id = document.getElementById('txtId').value;
+  document.getElementById('txtId').focus();
 
   if (id === '') {
     alert('Atenção!\nIdentificador não pode ser vazio!');
@@ -188,7 +189,7 @@ function cadastraCurso() {
       tbCursos.push(data);
       localStorage.setItem('tbCursos', JSON.stringify(tbCursos));
 
-      mostraLista();
+      mostraListaCursos();
     }
   }
 }
@@ -225,7 +226,7 @@ function deleteItem(id) {
           if (confirm('Excluir ' + id + ' - ' + JSON.parse(tbCursos[i]).title + '?')) {
             tbCursos.splice(i, 1);
             localStorage.setItem('tbCursos', JSON.stringify(tbCursos));
-            mostraLista();
+            mostraListaCursos();
           }
       }
   }
