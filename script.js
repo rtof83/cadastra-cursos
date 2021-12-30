@@ -8,6 +8,8 @@ tbAulas = JSON.parse(tbAulas);
 if (tbAulas == null) { tbAulas = [] };
 // Tabelas
 
+let setUpdate = '';
+
 // --------------------------------------------------------
 
 function mostraListaCursos(select) {
@@ -34,30 +36,26 @@ function mostraListaCursos(select) {
 function montaListaCursos(select) {
   let montaSelect = '';
   let montaTable = '';
-
+  let montaHTMLTb = '';
+  
   for (i in tbCursos) {
     montaSelect += '<option>'+JSON.parse(tbCursos[i]).title+'</option>';
     
+    montaHTMLTb = '<tr>'
+              +    '<td>'+JSON.parse(tbCursos[i]).id+'</td>'
+              +    '<td>'+JSON.parse(tbCursos[i]).title+'</td>'
+              +    '<td>'+JSON.parse(tbCursos[i]).desc+'</td>'
+              +    '<td><a href="'+JSON.parse(tbCursos[i]).image+'" target="_blank">'+JSON.parse(tbCursos[i]).image+'</a></td>'
+              +    '<td>'+JSON.parse(tbCursos[i]).professor+'</td>'
+              +    '<td class="lastTd"><button class="remove" onclick="deleteItem('+JSON.parse(tbCursos[i]).id+')">excluir</button>'
+              +    '<button class="update" onclick="updateItem('+JSON.parse(tbCursos[i]).id+')">atualizar</button></td>'
+              +  '</tr>';
+
     if (!select) {
-      montaTable += '<tr>'
-                 +    '<td>'+JSON.parse(tbCursos[i]).id+'</td>'
-                 +    '<td>'+JSON.parse(tbCursos[i]).title+'</td>'
-                 +    '<td>'+JSON.parse(tbCursos[i]).desc+'</td>'
-                 +    '<td><a href="'+JSON.parse(tbCursos[i]).image+'" target="_blank">'+JSON.parse(tbCursos[i]).image+'</a></td>'
-                 +    '<td>'+JSON.parse(tbCursos[i]).professor+'</td>'
-                 +    '<td class="lastTd"><button onclick="deleteItem('+JSON.parse(tbCursos[i]).id+')">excluir</button></td>'
-                 +  '</tr>';
+
+      montaTable += montaHTMLTb;
     } else {
-      if (JSON.parse(tbCursos[i]).title === select) {
-        montaTable += '<tr>'
-                 +    '<td>'+JSON.parse(tbCursos[i]).id+'</td>'
-                 +    '<td>'+JSON.parse(tbCursos[i]).title+'</td>'
-                 +    '<td>'+JSON.parse(tbCursos[i]).desc+'</td>'
-                 +    '<td><a href="'+JSON.parse(tbCursos[i]).image+'" target="_blank">'+JSON.parse(tbCursos[i]).image+'</a></td>'
-                 +    '<td>'+JSON.parse(tbCursos[i]).professor+'</td>'
-                 +    '<td class="lastTd"><button onclick="deleteItem('+JSON.parse(tbCursos[i]).id+')">excluir</button></td>'
-                 +  '</tr>';
-      }
+      if (JSON.parse(tbCursos[i]).title === select) montaTable += montaHTMLTb;
     }
   }
 
@@ -94,14 +92,14 @@ function montaListaAulas(select) {
       montaTableClass += '<tr>'
                  +    '<td>'+JSON.parse(tbAulas[i]).idClass+'</td>'
                  +    '<td>'+JSON.parse(tbAulas[i]).classLink+'</td>'
-                 +    '<td class="lastTd"><button onclick="deleteItemClass('+JSON.parse(tbAulas[i]).record+')">excluir</button></td>'
+                 +    '<td class="lastTd"><button class="remove" onclick="deleteItemClass('+JSON.parse(tbAulas[i]).record+')">excluir</button></td>'
                  +  '</tr>';
     } else {
       if (JSON.parse(tbAulas[i]).title === select) {
         montaTableClass += '<tr>'
         +    '<td>'+JSON.parse(tbAulas[i]).idClass+'</td>'
         +    '<td>'+JSON.parse(tbAulas[i]).classLink+'</td>'
-        +    '<td class="lastTd"><button onclick="deleteItemClass('+JSON.parse(tbAulas[i]).record+')">excluir</button></td>'
+        +    '<td class="lastTd"><button class="remove" onclick="deleteItemClass('+JSON.parse(tbAulas[i]).record+')">excluir</button></td>'
                  +  '</tr>';
       }
     }
@@ -110,17 +108,31 @@ function montaListaAulas(select) {
   return montaTableClass;
 }
 
-function mostraCurso() {
-    document.getElementById('content1').innerHTML =
-      '<form id="formCurso">'
-      + '<h4>Cadastrar curso</h4>'
-      + '<input type="text" id="txtId" placeholder="Identificador">'
-      + '<input type="text" id="txtTitle" placeholder="Título">'
-      + '<input type="text" id="txtDesc" placeholder="Descrição">'
-      + '<input type="text" id="txtImage" placeholder="Imagem">'
-      + '<input type="text" id="txtProfessor" placeholder="Professor">'
-      + '<input class="button" type="submit" value="Cadastrar" onclick="cadastraCurso()">'
-      +'</form>';
+function mostraCurso(state) {
+  let montaHeader, montaBtn;
+  if (state === 'update') {
+    montaHeader = '<h4>Atualizar curso</h4>'
+                   + '<input type="text" id="txtId" placeholder="Identificador" disabled="">';
+    
+    montaBtn = '<input class="button" id="btnCadastraCurso" type="submit" value="Atualizar" onclick="cadastraCurso(\'update\')">';
+  } else {
+    montaHeader = '<h4>Cadastrar curso</h4>'
+                   + '<input type="text" id="txtId" placeholder="Identificador">';
+
+    montaBtn = '<input class="button" id="btnCadastraCurso" type="submit" value="Cadastrar" onclick="cadastraCurso()">';
+  }
+
+  document.getElementById('content1').innerHTML =
+    '<form id="formCurso">'
+    + montaHeader
+    + '<input type="text" id="txtTitle" placeholder="Título">'
+    + '<input type="text" id="txtDesc" placeholder="Descrição">'
+    + '<input type="text" id="txtImage" placeholder="Imagem">'
+    + '<input type="text" id="txtProfessor" placeholder="Professor">'
+    + montaBtn
+    +'</form>';
+
+    state === 'update' ? document.getElementById('txtTitle').focus() : document.getElementById('txtId').focus();
 }
 
 function mostraAula() {
@@ -147,14 +159,13 @@ function fillFormAula() {
   }
 }
 
-function cadastraCurso() {
+function cadastraCurso(state) {
   document.getElementById('formCurso').addEventListener('submit', (e) => {
     e.preventDefault();
   });
 
   let erro = false;
   let id = document.getElementById('txtId').value;
-  document.getElementById('txtId').focus();
 
   if (id === '') {
     alert('Atenção!\nIdentificador não pode ser vazio!');
@@ -162,7 +173,7 @@ function cadastraCurso() {
   } else {
     if (tbCursos.length > 0) {
       for (let i in tbCursos) {
-        if (JSON.parse(tbCursos[i]).id === id) {
+        if (JSON.parse(tbCursos[i]).id === id && !state) {
           alert('Atenção!\nIdentificador já existe no sistema!');
           document.getElementById('txtId').focus();
           erro = true;
@@ -175,7 +186,23 @@ function cadastraCurso() {
       let desc = document.getElementById('txtDesc').value;
       let image = document.getElementById('txtImage').value;
       let professor = document.getElementById('txtProfessor').value;
-      let record = Date.now(); 
+
+      let record, recordUpdated;
+      if (state === 'update') {
+        record = setUpdate;
+        recordUpdated = Date.now();
+        setUpdate = '';
+
+        for (i in tbCursos) {
+          if (JSON.parse(tbCursos[i]).id == id) {
+            tbCursos.splice(i, 1);
+            localStorage.setItem('tbCursos', JSON.stringify(tbCursos));
+          }
+        }
+      } else {
+        record = Date.now();
+        recordUpdated = '';
+      }
 
       let data = JSON.stringify({
         id,
@@ -184,6 +211,7 @@ function cadastraCurso() {
         image,
         professor,
         record,
+        recordUpdated,
       });
 
       tbCursos.push(data);
@@ -244,3 +272,17 @@ function deleteItemClass(id) {
   }
 }
 
+const updateItem = (id) => {
+  for (i in tbCursos) {
+    if (JSON.parse(tbCursos[i]).id == id) {
+      mostraCurso('update');
+
+      document.getElementById('txtId').value = JSON.parse(tbCursos[i]).id;
+      document.getElementById('txtTitle').value = JSON.parse(tbCursos[i]).title;
+      document.getElementById('txtDesc').value = JSON.parse(tbCursos[i]).desc;
+      document.getElementById('txtImage').value = JSON.parse(tbCursos[i]).image;
+      document.getElementById('txtProfessor').value = JSON.parse(tbCursos[i]).professor;
+      setUpdate = JSON.parse(tbCursos[i]).record;
+    }
+  }
+}

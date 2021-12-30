@@ -40,7 +40,7 @@ html {
 .logo {
     height: 6.5rem;
     margin-top: 1rem;
-    margin-left: 1.75rem; 
+    margin-left: 2rem; 
 }
 
 .section-container{
@@ -121,6 +121,25 @@ input {
     color: rgb(221, 25, 25);;
 }
 
+.update {
+    margin-bottom: .5rem;
+    text-align: center;
+    border-radius: 1rem;
+    background: rgb(54, 25, 221);
+    color: #fff;
+    font-weight: bold;
+    padding: .25rem;
+    margin-right: .5rem;
+    cursor: pointer;
+    transition: .3;
+}
+
+.update:hover {
+    transition: .3s;
+    background-color: rgba(206, 205, 205, 0.822);
+    color: rgb(54, 25, 221);;
+}
+
 .arrow {
     margin-top: 1rem;
     height: 2rem;
@@ -141,6 +160,9 @@ table{
 th, td {
     padding: 10px 20px;
     border: 1px solid #000;
+    max-width: 600px;
+    overflow: hidden;
+    transition: 0.2s;       
 }
 
 form {
