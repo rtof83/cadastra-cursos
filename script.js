@@ -47,12 +47,11 @@ function montaListaCursos(select) {
               +    '<td>'+JSON.parse(tbCursos[i]).desc+'</td>'
               +    '<td><a href="'+JSON.parse(tbCursos[i]).image+'" target="_blank">'+JSON.parse(tbCursos[i]).image+'</a></td>'
               +    '<td>'+JSON.parse(tbCursos[i]).professor+'</td>'
-              +    '<td class="lastTd"><button class="remove" onclick="deleteItem('+JSON.parse(tbCursos[i]).id+')">excluir</button>'
-              +    '<button class="update" onclick="updateItem('+JSON.parse(tbCursos[i]).id+')">atualizar</button></td>'
+              +    '<td class="lastTd"><button class="remove" onclick="deleteItem(\''+JSON.parse(tbCursos[i]).id+'\')">excluir</button>'
+              +    '<button class="update" onclick="updateItem(\''+JSON.parse(tbCursos[i]).id+'\')">atualizar</button></td>'
               +  '</tr>';
 
     if (!select) {
-
       montaTable += montaHTMLTb;
     } else {
       if (JSON.parse(tbCursos[i]).title === select) montaTable += montaHTMLTb;
@@ -86,22 +85,19 @@ function mostraListaAulas() {
 
 function montaListaAulas(select) {
   let montaTableClass = '';
+  let montaHTMLTb = '';
 
   for (i in tbAulas) {
+    montaHTMLTb = '<tr>'
+              +    '<td>'+JSON.parse(tbAulas[i]).idClass+'</td>'
+              +    '<td>'+JSON.parse(tbAulas[i]).classLink+'</td>'
+              +    '<td class="lastTd"><button class="remove" onclick="deleteItemClass(\''+JSON.parse(tbAulas[i]).record+'\')">excluir</button></td>'
+              +  '</tr>';
+
     if (!select) {
-      montaTableClass += '<tr>'
-                 +    '<td>'+JSON.parse(tbAulas[i]).idClass+'</td>'
-                 +    '<td>'+JSON.parse(tbAulas[i]).classLink+'</td>'
-                 +    '<td class="lastTd"><button class="remove" onclick="deleteItemClass('+JSON.parse(tbAulas[i]).record+')">excluir</button></td>'
-                 +  '</tr>';
+      montaTableClass += montaHTMLTb;
     } else {
-      if (JSON.parse(tbAulas[i]).title === select) {
-        montaTableClass += '<tr>'
-        +    '<td>'+JSON.parse(tbAulas[i]).idClass+'</td>'
-        +    '<td>'+JSON.parse(tbAulas[i]).classLink+'</td>'
-        +    '<td class="lastTd"><button class="remove" onclick="deleteItemClass('+JSON.parse(tbAulas[i]).record+')">excluir</button></td>'
-                 +  '</tr>';
-      }
+      if (JSON.parse(tbAulas[i]).title === select) montaTableClass += montaHTMLTb;
     }
   }
 
@@ -187,18 +183,13 @@ function cadastraCurso(state) {
       let image = document.getElementById('txtImage').value;
       let professor = document.getElementById('txtProfessor').value;
 
-      let record, recordUpdated;
+      let record, recordUpdated, indexUpdate;
       if (state === 'update') {
         record = setUpdate;
         recordUpdated = Date.now();
         setUpdate = '';
 
-        for (i in tbCursos) {
-          if (JSON.parse(tbCursos[i]).id == id) {
-            tbCursos.splice(i, 1);
-            localStorage.setItem('tbCursos', JSON.stringify(tbCursos));
-          }
-        }
+        indexUpdate = tbCursos.findIndex(i => JSON.parse(i).id == id);
       } else {
         record = Date.now();
         recordUpdated = '';
@@ -214,7 +205,7 @@ function cadastraCurso(state) {
         recordUpdated,
       });
 
-      tbCursos.push(data);
+      indexUpdate ? tbCursos.splice(indexUpdate, 1, data) : tbCursos.push(data);
       localStorage.setItem('tbCursos', JSON.stringify(tbCursos));
 
       mostraListaCursos();
@@ -249,26 +240,20 @@ function cadastraAula() {
 }
 
 function deleteItem(id) {
-  for (i in tbCursos) {
-    if (JSON.parse(tbCursos[i]).id == id) {
-          if (confirm('Excluir ' + id + ' - ' + JSON.parse(tbCursos[i]).title + '?')) {
-            tbCursos.splice(i, 1);
-            localStorage.setItem('tbCursos', JSON.stringify(tbCursos));
-            mostraListaCursos();
-          }
-      }
+  let indexDelete = tbCursos.findIndex(i => JSON.parse(i).id == id);
+  if (confirm(`Excluir ${id} - ${JSON.parse(tbCursos[indexDelete]).title}?`)) {
+    tbCursos.splice(indexDelete, 1);
+    localStorage.setItem('tbCursos', JSON.stringify(tbCursos));
+    mostraListaCursos();
   }
 }
 
-function deleteItemClass(id) {
-  for (i in tbAulas) {
-    if (JSON.parse(tbAulas[i]).record == id) {
-          if (confirm('Excluir ' + JSON.parse(tbAulas[i]).idClass + ' - ' + JSON.parse(tbAulas[i]).classLink + '?')) {
-            tbAulas.splice(i, 1);
-            localStorage.setItem('tbAulas', JSON.stringify(tbAulas));
-            mostraListaAulas();
-          }
-      }
+function deleteItemClass(record) {
+  let indexDelete = tbAulas.findIndex(i => JSON.parse(i).record == record);
+  if (confirm(`Excluir ${JSON.parse(tbAulas[indexDelete]).idClass} - ${JSON.parse(tbAulas[indexDelete]).classLink}?`)) {
+    tbAulas.splice(indexDelete, 1);
+    localStorage.setItem('tbAulas', JSON.stringify(tbAulas));
+    mostraListaAulas();
   }
 }
 
