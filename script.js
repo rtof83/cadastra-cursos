@@ -205,7 +205,8 @@ function cadastraCurso(state) {
         recordUpdated,
       });
 
-      indexUpdate ? tbCursos.splice(indexUpdate, 1, data) : tbCursos.push(data);
+      // atualiza registro existente ou adiciona novo
+      state === 'update' ? tbCursos.splice(indexUpdate, 1, data) : tbCursos.push(data);
       localStorage.setItem('tbCursos', JSON.stringify(tbCursos));
 
       mostraListaCursos();
